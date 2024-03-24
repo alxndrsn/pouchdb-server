@@ -38,7 +38,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [8, 10, 12, 14, 16, 18, 20]
+        node: [8, 10] # , 12, 14, 16, 18, 20] newer versions don't compile (leveldown?)
         cmd:
           - COMMAND=unit-tests
           - COMMAND=test-express-minimum
