@@ -63,5 +63,4 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm ci
-      - run: export ${{ matrix.cmd }}
-      - run: npm run $COMMAND
+      - run: export ${{ matrix.cmd }} && npm run $COMMAND
