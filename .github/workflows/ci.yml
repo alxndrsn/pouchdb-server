@@ -1,0 +1,66 @@
+name: PouchDB CI
+
+on:
+  push: {}
+  pull_request:
+    branches: [master]
+
+env:
+  NODE_VERSION: 20
+
+jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/install-deps
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: npm run eslint
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: sudo apt-get install shellcheck
+      - run: git ls-files '*.sh' | xargs shellcheck
+
+  test:
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [8, 10, 12, 14, 16, 18, 20]
+        cmd:
+          - COMMAND=unit-tests
+          - COMMAND=test-express-minimum
+          - CLIENT=node COMMAND=test-pouchdb
+          - CLIENT=node SERVER_ARGS=--in-memory COMMAND=test-pouchdb
+          - CLIENT=node SERVER_ARGS=--sqlite COMMAND=test-pouchdb
+          - CLIENT=node SERVER_ARGS="--level-backend memdown" COMMAND=test-pouchdb
+
+          # Test in firefox/phantomjs running on travis
+          - CLIENT=selenium:firefox COMMAND=test-pouchdb
+          - CLIENT=selenium:phantomjs COMMAND=test-pouchdb
+
+          # Run the mapreduce tests
+          - COMMAND=test-pouchdb TYPE=mapreduce CLIENT=node
+          - COMMAND=test-pouchdb TYPE=mapreduce CLIENT=selenium:firefox
+
+          # Test against the couchdb harness
+          - COMMAND=test-couchdb
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/install-deps
+        with:
+          node-version: ${{ matrix.node }}
+      - id: test
+        run: ${{ matrix.cmd }}
