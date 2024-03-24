@@ -1,4 +1,4 @@
-name: PouchDB CI
+name: PouchDB Server CI
 
 on:
   push: {}
