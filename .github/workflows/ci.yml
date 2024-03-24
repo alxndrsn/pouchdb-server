@@ -67,4 +67,4 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm ci
       - id: test
-        run: ${{ matrix.cmd }}
+        run: ${{ matrix.cmd }} npm run $COMMAND
