@@ -5,9 +5,6 @@ on:
   pull_request:
     branches: [master]
 
-env:
-  NODE_VERSION: 20
-
 jobs:
 
   lint:
@@ -18,7 +15,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 10
       - run: npm ci
       - run: npm run eslint
 
